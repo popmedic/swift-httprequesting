@@ -6,12 +6,12 @@ final class HTTPRequestTests: XCTestCase {
 	override func setUp() {
 		MockConnection.reset()
 	}
-	
+
 	override func tearDown() {
 		MockConnection.reset()
 	}
-	
-    func testCallBadURL() {
+
+	func testCallBadURL() {
 		func urlTester(string: String) {
 			let url = URL(string: string)!
 			let req = HTTPRequest<MockConnection>(url: url)
@@ -29,8 +29,8 @@ final class HTTPRequestTests: XCTestCase {
 		urlTester(string: "htpps://testing:80")
 		urlTester(string: "httpss://testing")
 		urlTester(string: "://testing;'/")
-    }
-	
+	}
+
 	func testCallPortSetInURL() {
 		let givenPort: UInt16 = 8080
 		let url = URL(string: "http://test:\(givenPort)")!
@@ -38,7 +38,7 @@ final class HTTPRequestTests: XCTestCase {
 		XCTAssertNoThrow(try req.call())
 		XCTAssertEqual(MockConnection.initPort?.rawValue, givenPort)
 	}
-	
+
 	func testCallPortSetInSchemeSecure() {
 		let expPort: UInt16 = 443
 		let url = URL(string: "https://test")!
@@ -46,7 +46,7 @@ final class HTTPRequestTests: XCTestCase {
 		XCTAssertNoThrow(try req.call())
 		XCTAssertEqual(MockConnection.initPort?.rawValue, expPort)
 	}
-	
+
 	func testCallPortSetInSchemeInsecure() {
 		let expPort: UInt16 = 80
 		let url = URL(string: "http://test")!
@@ -54,7 +54,7 @@ final class HTTPRequestTests: XCTestCase {
 		XCTAssertNoThrow(try req.call())
 		XCTAssertEqual(MockConnection.initPort?.rawValue, expPort)
 	}
-	
+
 	func testCallNegativeTimeout() {
 		let url = URL(string: "https://mytown")!
 		let req = HTTPRequest<MockConnection>(url: url, timeout: -10)
@@ -69,7 +69,7 @@ final class HTTPRequestTests: XCTestCase {
 			}
 		}
 	}
-	
+
 	func testCallTimeoutOutOfBounds() {
 		let url = URL(string: "http://test")!
 		let req = HTTPRequest<MockConnection>(url: url,
@@ -85,7 +85,7 @@ final class HTTPRequestTests: XCTestCase {
 			}
 		}
 	}
-	
+
 	func testCallRequireInterface() {
 		func givenInterfaceTest(givenInterface: NWInterface.InterfaceType) {
 			let url = URL(string: "http://test")!
@@ -102,7 +102,7 @@ final class HTTPRequestTests: XCTestCase {
 		givenInterfaceTest(givenInterface: .wifi)
 		givenInterfaceTest(givenInterface: .wiredEthernet)
 	}
-	
+
 	func testCallQueueSet() {
 		let givenQueue = DispatchQueue(label: "test")
 		let url = URL(string: "http://test")!
@@ -112,7 +112,7 @@ final class HTTPRequestTests: XCTestCase {
 		XCTAssertEqual(MockConnection.startQueue,
 					   givenQueue)
 	}
-	
+
 	func testCallStartGet() {
 		let expMethod = HTTPRequest<MockConnection>.Method.get
 		let expPath = "/"
@@ -142,7 +142,7 @@ final class HTTPRequestTests: XCTestCase {
 		}
 		XCTAssertEqual(String(data: data, encoding: .ascii)?.count, exp.count)
 	}
-	
+
 	func testCallStartGetQuery() {
 		let expMethod = HTTPRequest<MockConnection>.Method.get
 		let expPath = "/how/about"
@@ -178,7 +178,7 @@ final class HTTPRequestTests: XCTestCase {
 		}
 		XCTAssertEqual(String(data: data, encoding: .ascii)?.count, exp.count)
 	}
-	
+
 	func testCallStartCancelled() {
 		let url = URL(string: "https://test/this/out?param=1&param2=something+else")!
 		let req = HTTPRequest<MockConnection>(url: url)
@@ -191,7 +191,7 @@ final class HTTPRequestTests: XCTestCase {
 		stateUpdateHandle(NWConnection.State.cancelled)
 		wait(for: [expectation], timeout: 0.5)
 	}
-	
+
 	func testCallStartFailed() {
 		let expError = NWError.posix(POSIXErrorCode.EACCES)
 		let state = NWConnection.State.failed(expError)
@@ -200,7 +200,7 @@ final class HTTPRequestTests: XCTestCase {
 		let expectation = XCTestExpectation(description: "complete called")
 		XCTAssertNoThrow(
 			try req.call(
-				handle: { error, data in
+				handle: { error, _ in
 					expectation.fulfill()
 					guard let error = error else {
 						XCTFail("should have an error")
@@ -221,7 +221,7 @@ final class HTTPRequestTests: XCTestCase {
 		wait(for: [expectation], timeout: 0.5)
 		XCTAssertEqual(MockConnection.cancelCallCount, 1)
 	}
-	
+
 	func testCallStartWait() {
 		let expError = NWError.posix(POSIXErrorCode.EACCES)
 		let state = NWConnection.State.waiting(expError)
@@ -230,7 +230,7 @@ final class HTTPRequestTests: XCTestCase {
 		let expectation = XCTestExpectation(description: "complete called")
 		XCTAssertNoThrow(
 			try req.call(
-				handle: { error, data in
+				handle: { error, _ in
 					expectation.fulfill()
 					guard let error = error else {
 						XCTFail("should have an error")
@@ -251,7 +251,7 @@ final class HTTPRequestTests: XCTestCase {
 		wait(for: [expectation], timeout: 0.5)
 		XCTAssertEqual(MockConnection.cancelCallCount, 1)
 	}
-	
+
 	func testCallRecieveError() {
 		let expError = NWError.posix(POSIXErrorCode.EACCES)
 		let url = URL(string: "https://test/this/out?param=1&param2=something+else")!
@@ -280,7 +280,7 @@ final class HTTPRequestTests: XCTestCase {
 		receiveCompletion(nil, nil, false, expError)
 		wait(for: [expectation], timeout: 0.5)
 	}
-	
+
 	func testCallReceiveData() {
 		let expData = "testing".data(using: .ascii)
 		let url = URL(string: "https://test/this/out?param=1&param2=something+else")!
@@ -302,7 +302,7 @@ final class HTTPRequestTests: XCTestCase {
 		receiveCompletion(expData, nil, false, nil)
 		wait(for: [expectation], timeout: 0.5)
 	}
-	
+
 	func testCallReceiveDataComplete() {
 		let expData = "testing".data(using: .ascii)
 		let url = URL(string: "https://test/this/out?param=1&param2=something+else")!
@@ -326,8 +326,8 @@ final class HTTPRequestTests: XCTestCase {
 		XCTAssertEqual(MockConnection.cancelCallCount, 1)
 	}
 
-    static var allTests = [
-        ("testCallBadURL", testCallBadURL),
+	static var allTests = [
+		("testCallBadURL", testCallBadURL),
 		("testCallPortSetInURL", testCallPortSetInURL),
 		("testCallPortSetInSchemeSecure", testCallPortSetInSchemeSecure),
 		("testCallPortSetInSchemeInsecure", testCallPortSetInSchemeInsecure),
@@ -343,5 +343,5 @@ final class HTTPRequestTests: XCTestCase {
 		("testCallRecieveError", testCallRecieveError),
 		("testCallReceiveData", testCallReceiveData),
 		("testCallReceiveDataComplete", testCallReceiveDataComplete)
-    ]
+	]
 }

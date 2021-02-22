@@ -15,11 +15,11 @@ public struct HTTPRequest<Connection: Connecting> {
 	/**
 	Initializes a new request
 	- parameters:
-		- url: location to request
-		- method: http method, **only supports get method**
-		- headers: http headers, will be merged with defaults
-		- timeout: time interval (seconds) till canceling the request
-		- interface: required interface to send the request on
+	- url: location to request
+	- method: http method, **only supports get method**
+	- headers: http headers, will be merged with defaults
+	- timeout: time interval (seconds) till canceling the request
+	- interface: required interface to send the request on
 	- returns: a new `HTTPRequest` for calling
 	- note: currently only supports get method
 	*/
@@ -39,9 +39,9 @@ public struct HTTPRequest<Connection: Connecting> {
 	/**
 	Call the request
 	- parameters:
-		- queue: dispatch queue to send the request on
-		- handle: http request handler that will be called on every connection state
-		- complete: http request completion that will be called when the request is complete
+	- queue: dispatch queue to send the request on
+	- handle: http request handler that will be called on every connection state
+	- complete: http request completion that will be called when the request is complete
 	- throws: HTTPRequestError
 	*/
 	public func call(queue: DispatchQueue? = nil,
@@ -88,7 +88,7 @@ public struct HTTPRequest<Connection: Connecting> {
 public extension HTTPRequest {
 	typealias Handler = (HTTPRequestError?, Data?) -> Void
 	typealias Completion = () -> Void
-	
+
 	enum Method {
 		case connect, delete, get, head, options, patch, post, put, trace
 		var string: String { "\(self)".uppercased() }
@@ -111,11 +111,11 @@ private extension HTTPRequest {
 			contentContext: .defaultMessage,
 			isComplete: true,
 			completion: NWConnection.SendCompletion.contentProcessed({ (error) in
-					if let error = error {
-						handle?(.send(error), nil) ?? ()
-						connection.cancel()
-					}
+				if let error = error {
+					handle?(.send(error), nil) ?? ()
+					connection.cancel()
 				}
+			}
 			)
 		)
 	}

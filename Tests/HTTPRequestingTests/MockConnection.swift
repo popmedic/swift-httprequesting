@@ -30,7 +30,7 @@ class MockConnection: Connecting {
 	static var receiveMaximumLength: Int?
 	static var receiveCompletion: ((Data?, NWConnection.ContentContext?, Bool, NWError?) -> Void)?
 	static var cancelCallCount = 0
-	
+
 	static func reset() {
 		initHost = nil
 		initPort = nil
@@ -49,7 +49,7 @@ class MockConnection: Connecting {
 		receiveCompletion = nil
 		cancelCallCount = 0
 	}
-	
+
 	required init(host: NWEndpoint.Host,
 				  port: NWEndpoint.Port,
 				  using: NWParameters) {
@@ -57,12 +57,12 @@ class MockConnection: Connecting {
 		MockConnection.initPort = port
 		MockConnection.initUsing = using
 	}
-	
+
 	func start(queue: DispatchQueue) {
 		MockConnection.startQueue = queue
 		MockConnection.startCallCount += 1
 	}
-	
+
 	func send(content: Data?,
 			  contentContext: NWConnection.ContentContext,
 			  isComplete: Bool,
@@ -73,7 +73,7 @@ class MockConnection: Connecting {
 		MockConnection.sendCompletion = completion
 		MockConnection.sendCallCount += 1
 	}
-	
+
 	func receive(minimumIncompleteLength: Int,
 				 maximumLength: Int,
 				 completion: @escaping (Data?,
@@ -85,7 +85,7 @@ class MockConnection: Connecting {
 		MockConnection.receiveCompletion = completion
 		MockConnection.receiveCallCount += 1
 	}
-	
+
 	func cancel() {
 		MockConnection.cancelCallCount += 1
 	}

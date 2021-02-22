@@ -8,12 +8,16 @@ public protocol Connecting {
 			  contentContext: NWConnection.ContentContext,
 			  isComplete: Bool,
 			  completion: NWConnection.SendCompletion)
-	func receive(minimumIncompleteLength: Int,
-				 maximumLength: Int,
-				 completion: @escaping (Data?,
-										NWConnection.ContentContext?,
-										Bool,
-										NWError?) -> Void)
+	func receive(
+		minimumIncompleteLength: Int,
+		maximumLength: Int,
+		completion: @escaping (
+			Data?,
+			NWConnection.ContentContext?,
+			Bool,
+			NWError?
+		) -> Void
+	)
 	func cancel()
 	init(host: NWEndpoint.Host, port: NWEndpoint.Port, using: NWParameters)
 }
