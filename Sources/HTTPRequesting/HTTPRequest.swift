@@ -213,8 +213,8 @@ private func validate(timeout: TimeInterval) throws -> Int {
 private func isHTTP(scheme: String) -> Bool {
 	isInsecure(scheme: scheme) || isSecure(scheme: scheme)
 }
-private func isInsecure(scheme: String) -> Bool { scheme == "http" }
-private func isSecure(scheme: String) -> Bool { scheme == "https" }
+private func isInsecure(scheme: String) -> Bool { scheme.lowercased() == "http" }
+private func isSecure(scheme: String) -> Bool { scheme.lowercased() == "https" }
 
 private let httpsPort: UInt16 = 443
 private let httpPort: UInt16 = 80
