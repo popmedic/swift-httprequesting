@@ -12,6 +12,13 @@ Point the request at a `URL` and it will get the raw response from the URL.
 ### Making a get request
 
 ```swift
+guard let url = URL(string: "https://www.yahoo.com") else {
+	print("bad url")
+	exit(1)
+}
+let timeout = 30 //seconds
+let requiredInterface: NWInterface.InterfaceType = .wifi
+
 let request = NWHTTPRequest(url: url,
                             timeout: timeout,
                             required: requiredInterface)
