@@ -26,7 +26,7 @@ try request.call(
         print("no error, no result")
     },
     complete: {
-        grp.leave()
+        // clean up if needed.
     }
 )
 ```
