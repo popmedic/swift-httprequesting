@@ -18,7 +18,7 @@ guard let timeout: TimeInterval = Double(CommandLine.arguments[2]) else {
 	exit(1)
 }
 
-var requiredInterface: NWInterface.InterfaceType? =
+let requiredInterface: NWInterface.InterfaceType? =
 	CommandLine.arguments.count > 3 ? .from(string: CommandLine.arguments[3]) : nil
 
 do {
