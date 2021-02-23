@@ -41,51 +41,6 @@ do {
 		   grp.leave()
 	   }
 	)
-	grp.enter()
-	try request.call(
-		handle: { (error, data) in
-			if let error = error { return print(error) }
-			if let data = data {
-				let result = String(data: data, encoding: .ascii) ??
-					"data could not be string encoded"
-				return print(result)
-		   }
-		   print("no error, no result")
-	   },
-	   complete: {
-		   grp.leave()
-	   }
-	)
-	grp.enter()
-	try request.call(
-		handle: { (error, data) in
-			if let error = error { return print(error) }
-			if let data = data {
-				let result = String(data: data, encoding: .ascii) ??
-					"data could not be string encoded"
-				return print(result)
-		   }
-		   print("no error, no result")
-	   },
-	   complete: {
-		   grp.leave()
-	   }
-	)
-	grp.enter()
-	try request.call(
-		handle: { (error, data) in
-			if let error = error { return print(error) }
-			if let data = data {
-				let result = String(data: data, encoding: .ascii) ??
-					"data could not be string encoded"
-				return print(result)
-		   }
-		   print("no error, no result")
-	   },
-	   complete: {
-		   grp.leave()
-	   }
-	)
 	grp.wait()
 } catch {
 	print(error)
