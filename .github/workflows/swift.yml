@@ -7,11 +7,22 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
 
     runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
-      run: ./cov.sh
+      run: swift test -v
+    
+    steps:
+    - uses: actions/checkout@master
+    - uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        files: ./coverage1.xml,./coverage2.xml # optional
+        flags: unittests # optional
+        name: codecov-umbrella # optional
+        fail_ci_if_error: true # optional (default = false)
+        verbose: true # optional (default = false)
