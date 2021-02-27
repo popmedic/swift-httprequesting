@@ -13,5 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Run linting
+      run: swiftlint --strict
     - name: Run tests
       run: swift test --enable-code-coverage
