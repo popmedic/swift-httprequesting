@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 BIN_PATH="$(swift build --show-bin-path)"
 XCTEST_PATH="$(find ${BIN_PATH} -name '*.xctest')"
 
@@ -8,7 +10,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     f="$(basename $XCTEST_PATH .xctest)"
     COV_BIN="${COV_BIN}/Contents/MacOS/$f"
 fi
-
+swiftlint --strict
 swift test --enable-code-coverage
 llvm-cov report \
     "${COV_BIN}" \
