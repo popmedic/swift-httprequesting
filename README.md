@@ -1,5 +1,4 @@
-Code Coverage
-
+Code Coverage:<br/>
 ![coverage](https://gist.githubusercontent.com/popmedic/a555f644f50b16b6dd3a04a28af6f293/raw/swift-httprequesting-coverage.svg)
 # swift-httprequest
 
