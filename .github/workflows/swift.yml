@@ -17,3 +17,5 @@ jobs:
       run: swiftlint --strict
     - name: Run tests
       run: swift test --enable-code-coverage
+    - name: Run coverage
+      run: ./cov.sh

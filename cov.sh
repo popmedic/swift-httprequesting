@@ -1,12 +1,14 @@
 #!/bin/sh
 
-echo ">>> linting..."
-swiftlint --strict
-[ $? != 0 ] && exit 1
+if [[ $1 = '+all' ]]; then
+    echo ">>> linting..."
+    swiftlint --strict
+    [ $? != 0 ] && exit 1
 
-echo ">>> testing..."
-swift test --enable-code-coverage
-[ $? != 0 ] && exit 1
+    echo ">>> testing..."
+    swift test --enable-code-coverage
+    [ $? != 0 ] && exit 1
+fi
 
 if [[ $1 = '+llvm_report' ]]; then
     echo "--- LLVM REPORT ---"
