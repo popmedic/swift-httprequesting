@@ -132,7 +132,7 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             fill="white"
             stroke="none"
             style="
-                font-size: 12pt;
+                font-size: 11pt;
                 font-family: Menlo;
                 text-anchor: middle;
             "
