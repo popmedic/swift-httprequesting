@@ -7,10 +7,21 @@ struct Args: ParsableCommand {
     enum Error: Swift.Error {
         case requiresURL
     }
-    @Option(name: [.long, .short]) var timeout: Double = 10.0
-    @Option(name: [.long, .short]) var requiredInterface: String?
-    @Flag(name: [.long, .short]) var insecured: Bool = false
-    @Argument var urlString: String
+    @Option(
+        name: [.long, .short],
+        help: "time to live for request"
+    ) var timeout: Double = 10.0
+    @Option(
+        name: [.long, .short],
+        help: "interface to force request on; wifi, cell, wired, loop"
+    ) var requiredInterface: String?
+    @Flag(
+        name: [.long, .short],
+        help: "allow self signed certificates on tls"
+    ) var insecured: Bool = false
+    @Argument(
+        help: "url to request; Eg. https://github.com/popmedic/swift-httprequesting"
+    ) var urlString: String
     
     mutating func run() throws {
         guard let url = URL(string: urlString) else {
