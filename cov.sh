@@ -115,7 +115,7 @@ if [[ " $@ " =~ " +update_badge " ]]; then
     LABELS=("instantiations" "functions" "lines" "regions")
     GISTS=("91a7a42d5a8b205ed4d4da6553969aa7" "66bf591f9bf0903867893afad30b8b2c" "85d803a29268ce9ae5a6e59f3d8f7882" "ac14c03f4beef83001796db0c3a4c112")
     COVERAGE_GIST=coverage.gist
-    for idx in 0 1 2 3; do
+    for idx in {0..3}; do
         GIST_URL="git@gist.github.com:${GISTS[$idx]}.git"
         echo "   ► cloning gist ${GIST_URL} into ${COVERAGE_GIST}..."
         git clone "${GIST_URL}" "${COVERAGE_GIST}"
