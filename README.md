@@ -25,11 +25,13 @@ guard let url = URL(string: "https://www.yahoo.com") else {
 }
 let timeout = 30 //seconds
 let requiredInterface: NWInterface.InterfaceType = .wifi
+let insecured = true // allow self signed certs
 
 let request = NWHTTPRequest(url: url,
                             timeout: timeout,
                             required: requiredInterface)
 try request.call(
+    insecured: insecured
     handle: { (error, data) in
         if let error = error { return print(error) }
         if let data = data {
