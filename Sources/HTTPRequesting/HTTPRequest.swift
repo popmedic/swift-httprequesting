@@ -44,7 +44,8 @@ public struct HTTPRequest<Connection: Connecting> {
      - complete: http request completion that will be called when the request is complete
      - throws: HTTPRequestError
      */
-    public func call(queue: DispatchQueue? = nil,
+    public func call(insecured: Bool = false,
+                     queue: DispatchQueue? = nil,
                      handle: Handler? = nil,
                      complete: Completion? = nil) throws {
         let (validatedHost, scheme) = try validate(url: url)
@@ -57,6 +58,13 @@ public struct HTTPRequest<Connection: Connecting> {
         tcp.connectionTimeout = try validate(timeout: timeout)
 
         let tls = NWProtocolTLS.Options()
+        if insecured {
+            sec_protocol_options_set_verify_block(
+                tls.securityProtocolOptions,
+                { _, _, complete in complete(true) },
+                queue ?? .httpRequest
+            )
+        }
 
         let params = isSecure(scheme: scheme) ? NWParameters(tls: tls, tcp: tcp) : .tcp
         if let interface = interface { params.requiredInterfaceType = interface }
