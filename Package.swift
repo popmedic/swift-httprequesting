@@ -4,22 +4,42 @@ import PackageDescription
 
 let package = Package(
     name: "swift-httprequest",
-	platforms: [.macOS(.v10_14), .iOS(.v14)],
-    products: [.library(
-            name: "HTTPRequesting",
-            targets: ["HTTPRequesting"]),
-		.executable(name: "httpreq",
-					targets: ["httpreq"])
+	platforms: [
+        .macOS(.v10_14),
+        .iOS(.v14)
     ],
-    dependencies: [],
+    products: [
+        .library(
+            name: "HTTPRequesting",
+            targets: ["HTTPRequesting"]
+        ),
+		.executable(
+            name: "httpreq",
+            targets: ["httpreq"]
+        )
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser",
+                 from: "0.2.0"),
+    ],
     targets: [
         .target(
             name: "HTTPRequesting",
-            dependencies: []),
+            dependencies: []
+        ),
         .testTarget(
             name: "HTTPRequestingTests",
-            dependencies: ["HTTPRequesting"]),
-		.target(name: "httpreq",
-				dependencies: ["HTTPRequesting"])
+            dependencies: ["HTTPRequesting"]
+        ),
+		.target(
+            name: "httpreq",
+            dependencies: [
+                "HTTPRequesting",
+                .product(
+                    name: "ArgumentParser",
+                    package: "swift-argument-parser"
+                )
+            ]
+        )
     ]
 )
