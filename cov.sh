@@ -56,62 +56,90 @@ echo "      ★ regions: ${PERCENT_REGIONS}%"
 
 if [[ " $@ " =~ " +update_badge " ]]; then
     echo "► uploading badges:"
-    TMPL='<svg  xmlns="http://www.w3.org/2000/svg"
+    TMPL='<svg 
+    xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     width="128"
-    height="24">
-<rect 
-    x="0" 
-    y="0" 
-    height="100%" 
-    width="100%"
-    stroke="#0a700a"
-    fill="#8c1515"
-    style="
-        stroke-width: 2;
-        rx: 8;
-        ry: 8;
-    "
-/>
-<mask
-    x="0"
-    y="0"
-    id="mask">
-    <rect 
-        fill="white" 
-        width="{{PERCENT}}%" 
-        height="100%" 
-    />
-</mask>
-<rect 
-    x="0" 
-    y="0" 
-    height="100%" 
-    width="100%"
-    stroke="#0a700a"
-    fill="#0a700a"
-    style="
-        stroke-width: 2;
-        rx: 8;
-        ry: 8;
-    "
-    mask="url(#mask)"
-/>
-<text 
-    x="50%" 
-    y="18" 
-    height="100%" 
-    width="50%"
-    style="
-        fill: #FFFFFF; 
-        font-size: 16;
-        font-family: Arial;
-        stroke: none; 
-        text-anchor: middle;
-    "
->
-{{PERCENT}}%
-</text>
+    height="44">
+    <svg
+        width="128"
+        height="18"
+         x="0"
+         y="0">
+        <text 
+            x="50%" 
+            y="14" 
+            height="100%" 
+            width="100%"
+            fill="#353535"
+            stroke="none"
+            style="
+                font-size: 10pt;
+                font-family: Menlo;
+                text-anchor: middle;
+            "
+        >
+            {{LABEL}}
+        </text>
+    </svg>
+    <svg 
+        width="128"
+        height="24"
+         x="0"
+         y="20">
+        <rect 
+            x="0" 
+            y="0" 
+            height="100%" 
+            width="100%"
+            stroke="#FF1515"
+            fill="#8c1515"
+            style="
+                stroke-width: 2;
+                rx: 8;
+                ry: 8;
+            "
+        />
+        <mask
+            x="0"
+            y="0"
+            id="mask">
+            <rect 
+                fill="white" 
+                width="{{PERCENT}}%" 
+                height="100%" 
+            />
+        </mask>
+        <rect 
+            x="0" 
+            y="0" 
+            height="100%" 
+            width="100%"
+            stroke="#0aff0a"
+            fill="#0a700a"
+            style="
+                stroke-width: 2;
+                rx: 8;
+                ry: 8;
+            "
+            mask="url(#mask)"
+        />
+        <text 
+            x="50%" 
+            y="18" 
+            height="100%" 
+            width="50%"
+            fill="white"
+            stroke="none"
+            style="
+                font-size: 12pt;
+                font-family: Menlo;
+                text-anchor: middle;
+            "
+        >
+        {{PERCENT}}%
+        </text>
+    </svg>
 </svg>'
     
     PERCENTS=("${PERCENT_INSTANTIATIONS}" "${PERCENT_FUNCTIONS}" "${PERCENT_LINES}" "${PERCENT_REGIONS}")
@@ -129,7 +157,10 @@ if [[ " $@ " =~ " +update_badge " ]]; then
         echo "      ► creating SVG ${SVG}..."
         
         SVG_PATH="${COVERAGE_GIST}/${SVG}"
-        echo "$TMPL" | sed 's/{{PERCENT}}/'"${PERCENTS[$idx]}"'/' > "${SVG_PATH}"
+        echo "$TMPL" | \
+            sed 's/{{PERCENT}}/'"${PERCENTS[$idx]}"'/' | \
+            sed 's/{{LABEL}}/'"$(tr '[:lower:]' '[:upper:]' <<< ${LABELS[$idx]:0:1})${LABELS[$idx]:1}"'/' > \
+            "${SVG_PATH}"
         [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
         echo "      ► created SVG: \"${SVG_PATH}\""
 
