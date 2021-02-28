@@ -19,17 +19,21 @@ Point the request at a `URL` and it will get the raw response from the URL.
 ### Making a get request
 
 ```swift
+import Foundation
+import HTTPRequesting
+import Network
+
 guard let url = URL(string: "https://www.yahoo.com") else {
 	print("bad url")
 	exit(1)
 }
 let timeout = 30 //seconds
-let requiredInterface: NWInterface.InterfaceType = .wifi
+let required = NWInterface.InterfaceType.wifi
 let insecured = true // allow self signed certs
 
 let request = NWHTTPRequest(url: url,
                             timeout: timeout,
-                            required: requiredInterface)
+                            required: required)
 try request.call(
     insecured: insecured
     handle: { (error, data) in
