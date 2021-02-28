@@ -67,7 +67,7 @@ if [[ " $@ " =~ " +update_badge " ]]; then
          x="0"
          y="0">
         <text 
-            x="2" 
+            x="6" 
             y="14" 
             height="100%" 
             width="100%"
