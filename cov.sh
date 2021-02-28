@@ -67,7 +67,7 @@ if [[ " $@ " =~ " +update_badge " ]]; then
          x="0"
          y="0">
         <text 
-            x="50%" 
+            x="2" 
             y="14" 
             height="100%" 
             width="100%"
@@ -76,7 +76,7 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             style="
                 font-size: 10pt;
                 font-family: Menlo;
-                text-anchor: middle;
+                text-anchor: left;
             "
         >
             {{LABEL}}
