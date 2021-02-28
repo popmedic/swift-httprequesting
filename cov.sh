@@ -92,12 +92,12 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             y="0" 
             height="100%" 
             width="100%"
-            stroke="#FF1515"
+            stroke="lightgray"
             fill="#8c1515"
             rx="10px"
             ry="10px"
             style="
-                stroke-width: 2px;
+                stroke-width: 1px;
             "
         />
         <mask
@@ -115,12 +115,12 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             y="0" 
             height="100%" 
             width="100%"
-            stroke="#0aff0a"
+            stroke="lightgray"
             fill="#0a700a"
             rx="10px"
             ry="10px"
             style="
-                stroke-width: 2px;
+                stroke-width: 1px;
             "
             mask="url(#mask)"
         />
