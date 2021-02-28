@@ -94,10 +94,10 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             width="100%"
             stroke="#FF1515"
             fill="#8c1515"
+            rx="10px"
+            ry="10px"
             style="
-                stroke-width: 2;
-                rx: 8;
-                ry: 8;
+                stroke-width: 2px;
             "
         />
         <mask
@@ -117,10 +117,10 @@ if [[ " $@ " =~ " +update_badge " ]]; then
             width="100%"
             stroke="#0aff0a"
             fill="#0a700a"
+            rx="10px"
+            ry="10px"
             style="
-                stroke-width: 2;
-                rx: 8;
-                ry: 8;
+                stroke-width: 2px;
             "
             mask="url(#mask)"
         />
