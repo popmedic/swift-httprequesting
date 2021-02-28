@@ -31,27 +31,25 @@ echo "► generating coverage..."
 
 REGEX_LINES='"totals"\s*:\s*\{.*?"lines"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
 REGEX_FUNCTIONS='"totals"\s*:\s*\{.*?"functions"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
-REGEX_INSTANSIATIONS='"totals"\s*:\s*\{.*?"instantiations"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
+REGEX_INSTANTIATIONS='"totals"\s*:\s*\{.*?"instantiations"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
 REGEX_REGIONS='"totals"\s*:\s*\{.*?"regions"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
 COVFILE=".build/debug/codecov/swift-httprequest.json"
 
 PERCENT_LINES=`pcregrep -o1 "$REGEX_LINES" "$COVFILE" | cut -d'.' -f1`
+[ $? != 0 ] && exit 1
 PERCENT_FUNCTIONS=`pcregrep -o1 "$REGEX_FUNCTIONS" "$COVFILE" | cut -d'.' -f1`
-PERCENT_INSTANSIATIONS=`pcregrep -o1 "$REGEX_INSTANSIATIONS" "$COVFILE" | cut -d'.' -f1`
+[ $? != 0 ] && exit 1
+PERCENT_INSTANTIATIONS=`pcregrep -o1 "$REGEX_INSTANTIATIONS" "$COVFILE" | cut -d'.' -f1`
+[ $? != 0 ] && exit 1
 PERCENT_REGIONS=`pcregrep -o1 "$REGEX_REGIONS" "$COVFILE" | cut -d'.' -f1`
 [ $? != 0 ] && exit 1
 echo "   ► totals:"
-echo "     ★ instansiations: ${PERCENT_INSTANSIATIONS}%"
+echo "     ★ instantiations: ${PERCENT_INSTANTIATIONS}%"
 echo "     ★ functions: ${PERCENT_FUNCTIONS}%"
 echo "     ★ lines: ${PERCENT_LINES}%"
 echo "     ★ regions: ${PERCENT_REGIONS}%"
 
 if [[ " $@ " =~ " +update_badge " ]]; then
-    COVERAGE_GIST=coverage.gist
-    echo "   ► cloning gist into ${COVERAGE_GIST}..."
-    git clone git@gist.github.com:a555f644f50b16b6dd3a04a28af6f293.git "${COVERAGE_GIST}"
-    [ $? != 0 ] && exit 1
-
     TMPL='<svg  xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     width="128"
@@ -113,21 +111,33 @@ if [[ " $@ " =~ " +update_badge " ]]; then
     [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
     echo "   ► current hash: ${GIT_HASH}"
     
-    echo "   ► creating SVG..."
-    echo "$TMPL" | sed 's/{{PERCENT}}/'"$PERCENT_LINES"'/' > "${COVERAGE_GIST}/swift-httprequesting-coverage.svg"
-    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-    echo "   ► created SVG: \"${COVERAGE_GIST}/swift-httprequesting-coverage.svg\""
+    PERCENTS=("${PERCENT_INSTANTIATIONS}" "${PERCENT_FUNCTIONS}" "${PERCENT_LINES}" "${PERCENT_REGIONS}")
+    LABELS=("instantiations" "functions" "lines" "regions")
+    GISTS=("91a7a42d5a8b205ed4d4da6553969aa7" "66bf591f9bf0903867893afad30b8b2c" "85d803a29268ce9ae5a6e59f3d8f7882" "ac14c03f4beef83001796db0c3a4c112")
+    COVERAGE_GIST=coverage.gist
+    for idx in 0 1 2 3; do
+        GIST_URL="git@gist.github.com:${GISTS[$idx]}.git"
+        echo "   ► cloning gist ${GIST_URL} into ${COVERAGE_GIST}..."
+        git clone "${GIST_URL}" "${COVERAGE_GIST}"
+        [ $? != 0 ] && exit 1
+        
+        SVG="swift-httprequesting-${LABELS[$idx]}-coverage.svg"
+        echo "   ► creating SVG ${SVG}..."
+        
+        SVG_PATH="${COVERAGE_GIST}/${SVG}"
+        echo "$TMPL" | sed 's/{{PERCENT}}/'"${PERCENTS[$idx]}"'/' > "${SVG_PATH}"
+        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+        echo "   ► created SVG: \"${SVG_PATH}\""
 
-    echo "   ► push gist..."
-    pushd "${COVERAGE_GIST}" > /dev/null
-    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-    git commit -am "coverage update: ${GIT_HASH}"
-    [ $? != 0 ] && popd > /dev/null && rm -rf "${COVERAGE_GIST}" && exit 1
-    git push origin master
-    [ $? != 0 ] && popd > /dev/null && rm -rf "${COVERAGE_GIST}" && exit 1
-    popd > /dev/null
-    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-    rm -rf "${COVERAGE_GIST}"
+        echo "   ► push gist..."
+        pushd "${COVERAGE_GIST}" > /dev/null
+        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+        git commit -am "coverage update: ${GIT_HASH}"
+        git push origin master
+        popd > /dev/null
+        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+        rm -rf "${COVERAGE_GIST}"
+    done
 fi
 
 echo "► coveraged generated"
