@@ -13,7 +13,7 @@ let package = Package(
             name: "HTTPRequesting",
             targets: ["HTTPRequesting"]
         ),
-		.executable(
+        .executable(
             name: "httpreq",
             targets: ["httpreq"]
         )
@@ -31,7 +31,7 @@ let package = Package(
             name: "HTTPRequestingTests",
             dependencies: ["HTTPRequesting"]
         ),
-		.target(
+        .target(
             name: "httpreq",
             dependencies: [
                 "HTTPRequesting",
