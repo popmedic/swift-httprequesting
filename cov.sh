@@ -24,7 +24,7 @@ if [[ " $@ " =~ " +llvm_report " ]]; then
         f="$(basename $XCTEST_PATH .xctest)"
         COV_BIN="${COV_BIN}/Contents/MacOS/$f"
     fi
-    llvm-cov report \
+    xcrun llvm-cov report \
         "${COV_BIN}" \
         -instr-profile=.build/debug/codecov/default.profdata \
         -ignore-filename-regex=".build|Tests" \
