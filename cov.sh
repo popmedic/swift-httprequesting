@@ -14,48 +14,30 @@ if [[ " $@ " =~ " +all " ]]; then
     [ $? != 0 ] && exit 1
 fi
 
-if [[ " $@ " =~ " +llvm_report " ]]; then
-    echo "▶︎  LLVM REPORT  ◀︎"
-    BIN_PATH="$(swift build --show-bin-path)"
-    XCTEST_PATH="$(find ${BIN_PATH} -name '*.xctest')"
+echo "▶︎  LLVM REPORT  ◀︎"
+BIN_PATH="$(swift build --show-bin-path)"
+XCTEST_PATH="$(find ${BIN_PATH} -name '*.xctest')"
 
-    COV_BIN=$XCTEST_PATH
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        f="$(basename $XCTEST_PATH .xctest)"
-        COV_BIN="${COV_BIN}/Contents/MacOS/$f"
-    fi
-    xcrun llvm-cov report \
-        "${COV_BIN}" \
-        -instr-profile=.build/debug/codecov/default.profdata \
-        -ignore-filename-regex=".build|Tests" \
-        -use-color
+COV_BIN=$XCTEST_PATH
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    f="$(basename $XCTEST_PATH .xctest)"
+    COV_BIN="${COV_BIN}/Contents/MacOS/$f"
 fi
+LLVM_REPORT=`xcrun llvm-cov report \
+             "${COV_BIN}" \
+             -instr-profile=.build/debug/codecov/default.profdata \
+             -ignore-filename-regex=".build|Tests"`
+echo "${LLVM_REPORT}"
+PERCENT=`echo "${LLVM_REPORT}" | \
+         pcregrep -o1 "TOTAL\s+(.*)" | \
+         pcregrep -o1 '([0-9\.]+)\s*' | \
+         tail -n 1`
 
 echo "► generating coverage..."
-
-REGEX_LINES='"totals"\s*:\s*\{.*?"lines"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
-REGEX_FUNCTIONS='"totals"\s*:\s*\{.*?"functions"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
-REGEX_INSTANTIATIONS='"totals"\s*:\s*\{.*?"instantiations"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
-REGEX_REGIONS='"totals"\s*:\s*\{.*?"regions"\s*:\s*.*?"percent"\s*:([0-9\.]*)'
-COVFILE=".build/debug/codecov/swift-httprequest.json"
-
-PERCENT_LINES=`printf '%.2f' $(pcregrep -o1 "$REGEX_LINES" "$COVFILE")`
-[ $? != 0 ] && exit 1
-PERCENT_FUNCTIONS=`printf '%.2f' $(pcregrep -o1 "$REGEX_FUNCTIONS" "$COVFILE")`
-[ $? != 0 ] && exit 1
-PERCENT_INSTANTIATIONS=`printf '%.2f' $(pcregrep -o1 "$REGEX_INSTANTIATIONS" "$COVFILE")`
-[ $? != 0 ] && exit 1
-PERCENT_REGIONS=`printf '%.2f' $(pcregrep -o1 "$REGEX_REGIONS" "$COVFILE")`
-[ $? != 0 ] && exit 1
-
-echo "   ► totals:"
-echo "      ★ instantiations: ${PERCENT_INSTANTIATIONS}%"
-echo "      ★ functions: ${PERCENT_FUNCTIONS}%"
-echo "      ★ lines: ${PERCENT_LINES}%"
-echo "      ★ regions: ${PERCENT_REGIONS}%"
+echo "   ► total: ${PERCENT}%"
 
 if [[ " $@ " =~ " +update_badge " ]]; then
-    echo "► uploading badges:"
+    echo "► uploading badge:"
     TMPL='<svg 
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -142,37 +124,36 @@ if [[ " $@ " =~ " +update_badge " ]]; then
     </svg>
 </svg>'
     
-    PERCENTS=("${PERCENT_INSTANTIATIONS}" "${PERCENT_FUNCTIONS}" "${PERCENT_LINES}" "${PERCENT_REGIONS}")
-    LABELS=("instantiations" "functions" "lines" "regions")
-    GISTS=("91a7a42d5a8b205ed4d4da6553969aa7" "66bf591f9bf0903867893afad30b8b2c" "85d803a29268ce9ae5a6e59f3d8f7882" "ac14c03f4beef83001796db0c3a4c112")
+    LABEL="Code Coverage"
+    GIST="a555f644f50b16b6dd3a04a28af6f293"
     COVERAGE_GIST=coverage.gist
-    for idx in {0..3}; do
-        echo "   ► uploading badge for ${LABELS[$idx]}..."
-        GIST_URL="git@gist.github.com:${GISTS[$idx]}.git"
-        echo "      ► cloning gist ${GIST_URL} into ${COVERAGE_GIST}..."
-        git clone "${GIST_URL}" "${COVERAGE_GIST}" > /dev/null 2> /dev/null
-        [ $? != 0 ] && exit 1
+    echo "   ► uploading badge for ${LABEL}..."
+    GIST_URL="git@gist.github.com:${GIST}.git"
+    COVERAGE_GIST=coverage.gist
+    echo "   ► uploading badge for ${LABEL}..."
+    echo "      ► cloning gist ${GIST_URL} into ${COVERAGE_GIST}..."
+    git clone "${GIST_URL}" "${COVERAGE_GIST}" > /dev/null 2> /dev/null
+    [ $? != 0 ] && exit 1
         
-        SVG="swift-httprequesting-${LABELS[$idx]}-coverage.svg"
-        echo "      ► creating SVG ${SVG}..."
+    SVG="swift-httprequesting-coverage.svg"
+    echo "      ► creating SVG ${SVG}..."
         
-        SVG_PATH="${COVERAGE_GIST}/${SVG}"
-        echo "$TMPL" | \
-            sed 's/{{PERCENT}}/'"${PERCENTS[$idx]}"'/' | \
-            sed 's/{{LABEL}}/'"$(tr '[:lower:]' '[:upper:]' <<< ${LABELS[$idx]:0:1})${LABELS[$idx]:1}"'/' > \
-            "${SVG_PATH}"
-        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-        echo "      ► created SVG: \"${SVG_PATH}\""
+    SVG_PATH="${COVERAGE_GIST}/${SVG}"
+    echo "$TMPL" | \
+        sed 's/{{PERCENT}}/'"${PERCENT}"'/' | \
+        sed 's/{{LABEL}}/'"$(tr '[:lower:]' '[:upper:]' <<< ${LABEL:0:1})${LABEL:1}"'/' > \
+        "${SVG_PATH}"
+    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+    echo "      ► created SVG: \"${SVG_PATH}\""
 
-        echo "      ► push badge ${LABELS[$idx]}..."
-        pushd "${COVERAGE_GIST}" > /dev/null
-        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-        echo "      ► set commit \"coverage update: ${GIT_HASH}\""
-        git commit -am "coverage update: ${GIT_HASH}" > /dev/null 2> /dev/null
-        git push origin master > /dev/null 2> /dev/null
-        popd > /dev/null
-        [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
-        rm -rf "${COVERAGE_GIST}"
-        echo "      ► clean up: ${COVERAGE_GIST}"
-    done
+    echo "      ► push badge ${LABEL}..."
+    pushd "${COVERAGE_GIST}" > /dev/null
+    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+    echo "      ► set commit \"coverage update: ${GIT_HASH}\""
+    git commit -am "coverage update: ${GIT_HASH}" > /dev/null 2> /dev/null
+    git push origin master > /dev/null 2> /dev/null
+    popd > /dev/null
+    [ $? != 0 ] && rm -rf "${COVERAGE_GIST}" && exit 1
+    rm -rf "${COVERAGE_GIST}"
+    echo "      ► clean up: ${COVERAGE_GIST}"
 fi
