@@ -3,7 +3,7 @@ import HTTPRequesting
 import ArgumentParser
 import Network
 
-struct Args: ParsableCommand {
+struct httpreq: ParsableCommand {
     enum Error: Swift.Error {
         case requiresURL
     }
@@ -75,4 +75,4 @@ extension NWInterface.InterfaceType {
 	}
 }
 
-Args.main()
+httpreq.main()
