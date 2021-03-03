@@ -32,7 +32,8 @@ let timeout = 30.0
 // force the request over wifi
 let required = NWInterface.InterfaceType.wifi
 // allow self signed certs
-let validate = .insecure
+let validation = .insecure
+// better would be to use pinning.
 
 // create the reqeust
 let request = NWHTTPRequest(url: url,
@@ -40,7 +41,7 @@ let request = NWHTTPRequest(url: url,
                             required: required)
 // call the request
 try request.call(
-    certificate: insecured
+    certificate: validation
     handle: { (error, data) in
         // handle when data comes in
         // if there is an error, handle the error and return
