@@ -71,3 +71,12 @@ pinned validation.
 Pinning a certificate can be done by using the option `.certificate(String)`
 Pass in a base64 encode SHA256 of the x509 certificate that is expected from the host.
 This will validate that the host is using this certificate.
+
+You could also use the 
+```
+openssl x509 -in server.crt -outform der | \
+openssl dgst -sha256 -binary | \
+openssl enc -base64
+```
+openssl command to get the base64 encode SHA256 of the x509 certificate if you have access
+to it.
