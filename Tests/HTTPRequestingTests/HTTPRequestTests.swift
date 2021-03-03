@@ -305,6 +305,10 @@ extension HTTPRequestTests {
         wait(for: [expectation], timeout: 0.5)
     }
 
+    func testCallUsePinsWithInsecure() {
+
+    }
+
     func testCallReceiveDataComplete() {
         let expData = "testing".data(using: .ascii)
         let url = URL(string: "https://test/this/out?param=1&param2=something+else")!

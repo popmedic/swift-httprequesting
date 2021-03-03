@@ -39,12 +39,21 @@ public struct HTTPRequest<Connection: Connecting> {
     /**
      Call the request
      - parameters:
-     - queue: dispatch queue to send the request on
-     - handle: http request handler that will be called on every connection state
-     - complete: http request completion that will be called when the request is complete
+        - validation: a `CertificatePinning` implementation to use for validating the
+                      x509 from host
+        - certs: Dictionary of CN key with SHA256 hashs of public keys
+                 for the CA to pin to that CN
+        - queue: dispatch queue to send the request on
+        - handle: http request handler that will be called on every connection state
+        - complete: http request completion that will be called when the request is complete
      - throws: HTTPRequestError
+     - note: It is strongly suggested not to use `.insecure` validation.  This validation will allow
+     any certificates to be treated as valid.  Instead use the `.insecure` option in debug.  This will
+     allow you to see all the certificates associated with the host as base64 encoded strings.  Use one
+     of these strings in the `.certificate` validation to pin the hosts certificate.  This allows you to
+     safely deal with self signed certificates.
      */
-    public func call(insecured: Bool = false,
+    public func call(certificate validation: CertificatePinning = .normal,
                      queue: DispatchQueue? = nil,
                      handle: Handler? = nil,
                      complete: Completion? = nil) throws {
@@ -58,13 +67,14 @@ public struct HTTPRequest<Connection: Connecting> {
         tcp.connectionTimeout = try validate(timeout: timeout)
 
         let tls = NWProtocolTLS.Options()
-        if insecured {
-            sec_protocol_options_set_verify_block(
-                tls.securityProtocolOptions,
-                { _, _, complete in complete(true) },
-                queue ?? .httpRequest
-            )
-        }
+        sec_protocol_options_set_verify_block(
+            tls.securityProtocolOptions, { (metadata, trust, complete) in
+                validation.handle(metadata: metadata,
+                                            trust: trust,
+                                            complete: complete)
+            },
+            queue ?? .httpRequest
+        )
 
         let params = isSecure(scheme: scheme) ? NWParameters(tls: tls, tcp: tcp) : .tcp
         if let interface = interface { params.requiredInterfaceType = interface }

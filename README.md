@@ -9,11 +9,13 @@ Sometimes you need a little more control over your connection then `URLSession` 
 This class use `NWConnection` to create a `HTTPRequest` that does not need ATS exceptions. 
 Point the request at a `URL` and it will get the raw response from the URL.  
 
+## ONLY SUPPORTS HTTP GET METHOD.
+
 ## Usage
 
 ### Install with Swift Package Manager
 
-### Making a get request
+### Making a `GET` request
 
 ```swift
 import Foundation
@@ -30,7 +32,7 @@ let timeout = 30.0
 // force the request over wifi
 let required = NWInterface.InterfaceType.wifi
 // allow self signed certs
-let insecured = true
+let validate = .insecure
 
 // create the reqeust
 let request = NWHTTPRequest(url: url,
@@ -38,7 +40,7 @@ let request = NWHTTPRequest(url: url,
                             required: required)
 // call the request
 try request.call(
-    insecured: insecured
+    certificate: insecured
     handle: { (error, data) in
         // handle when data comes in
         // if there is an error, handle the error and return
@@ -56,3 +58,15 @@ try request.call(
     }
 )
 ```
+
+## Security
+
+You might want to use insecure that will allow any certificate to be used.
+
+> This is really dangerious.  I suggest using the insecure options to get the hosts certificate
+and then switch to using that certificates base64 encoded sha256 of the certificate for
+pinned validation.
+
+Pinning a certificate can be done by using the option `.certificate(String)`
+Pass in a base64 encode SHA256 of the x509 certificate that is expected from the host.
+This will validate that the host is using this certificate.

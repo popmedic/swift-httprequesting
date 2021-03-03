@@ -15,6 +15,10 @@ struct httpreq: ParsableCommand {
         name: [.long, .short],
         help: "interface to force request on; wifi, cell, wired, loop"
     ) var requiredInterface: String?
+    @Option(
+        name: [.long, .short],
+        help: "pin the certificate base64 of the SHA256"
+    ) var pinned: String?
     @Flag(
         name: [.long, .short],
         help: "allow self signed certificates on tls"
@@ -43,8 +47,12 @@ struct httpreq: ParsableCommand {
         let request = NWHTTPRequest(url: url,
                                     timeout: timeout,
                                     required: required)
+        let validation: CertificatePinning
+        if insecured { validation = .insecure }
+        else if let pinned = pinned { validation = .certificate(pinned) }
+        else { validation = .normal }
         try request.call(
-            insecured: insecured,
+            certificate: validation,
             handle: { (error, data) in
                 if let error = error { return print(error) }
                 if let data = data {
