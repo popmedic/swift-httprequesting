@@ -70,8 +70,8 @@ public struct HTTPRequest<Connection: Connecting> {
         sec_protocol_options_set_verify_block(
             tls.securityProtocolOptions, { (metadata, trust, complete) in
                 validation.handle(metadata: metadata,
-                                            trust: trust,
-                                            complete: complete)
+                                  trust: trust,
+                                  complete: complete)
             },
             queue ?? .httpRequest
         )
@@ -128,12 +128,13 @@ private extension HTTPRequest {
             content: content.data(using: .ascii),
             contentContext: .defaultMessage,
             isComplete: true,
-            completion: NWConnection.SendCompletion.contentProcessed({ (error) in
-                if let error = error {
-                    handle?(.send(error), nil) ?? ()
-                    connection.cancel()
+            completion: NWConnection.SendCompletion.contentProcessed(
+                { (error) in
+                    if let error = error {
+                        handle?(.send(error), nil) ?? ()
+                        connection.cancel()
+                    }
                 }
-            }
             )
         )
     }
