@@ -18,7 +18,7 @@ struct httpreq: ParsableCommand {
     @Option(
         name: [.long, .short],
         help: "pin the certificate base64 of the SHA256"
-    ) var pinned: String?
+    ) var pinned: [String] = []
     @Flag(
         name: [.long, .short],
         help: "allow self signed certificates on tls"
@@ -40,6 +40,7 @@ struct httpreq: ParsableCommand {
                 timeout: \(timeout)
                 required interface: \(required)
                 insecure allowed: \(insecured)
+                pins: \(pinned.joined(separator: ",\n\t"))
             """
         )
         let grp = DispatchGroup()
@@ -49,7 +50,7 @@ struct httpreq: ParsableCommand {
                                     required: required)
         let validation: CertificatePinning
         if insecured { validation = .insecure }
-        else if let pinned = pinned { validation = .certificate(pinned) }
+        else if !pinned.isEmpty { validation = .certificate(pinned) }
         else { validation = .normal }
         try request.call(
             certificate: validation,

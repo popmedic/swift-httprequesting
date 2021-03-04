@@ -6,7 +6,7 @@ public enum CertificatePinning {
         adhoc(sec_protocol_verify_t),
         insecure,
         normal,
-        certificate(String)
+        certificate([String])
 }
 
 public enum CertificatePinningError: Error {
@@ -22,16 +22,16 @@ extension CertificatePinning {
         case .insecure:
             debugPrint("it is prefered that you use a pinned certificate.")
             debugPrint("for this server you could pin:")
-            debugPrint(getBase64EncodedCertificateSHA256(from: trust).joined(separator: "\n"))
+            getEncCert(from: trust).forEach { debugPrint($0) }
             complete(true)
         case .normal:
             let trust = sec_trust_copy_ref(trust).takeRetainedValue()
             var error: CFError?
             complete(SecTrustEvaluateWithError(trust, &error))
         case .certificate(let pinned):
-            let base64certs = getBase64EncodedCertificateSHA256(from: trust)
+            let base64certs = getEncCert(from: trust)
             for cert in base64certs {
-                if cert == pinned {
+                if pinned.contains(cert) {
                     complete(true)
                     break
                 }
@@ -49,7 +49,7 @@ private func sha256(data : Data) -> Data {
     return Data(hash)
 }
 
-private func getBase64EncodedCertificateSHA256(from trust: sec_trust_t) -> [String] {
+private func getEncCert(from trust: sec_trust_t) -> [String] {
     let trust = sec_trust_copy_ref(trust).takeRetainedValue()
     let count = SecTrustGetCertificateCount(trust)
     var result = [String]()

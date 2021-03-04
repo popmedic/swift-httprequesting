@@ -68,7 +68,7 @@ You might want to use insecure that will allow any certificate to be used.
 and then switch to using that certificates base64 encoded sha256 of the certificate for
 pinned validation.
 
-Pinning a certificate can be done by using the option `.certificate(String)`
+Pinning a certificate can be done by using the option `.certificate([String])`
 Pass in a base64 encode SHA256 of the x509 certificate that is expected from the host.
 This will validate that the host is using this certificate.
 
