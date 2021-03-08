@@ -4,9 +4,9 @@ import CommonCrypto
 public enum CertificatePinning {
     case
         adhoc(sec_protocol_verify_t),
+        certificate([String]),
         insecure,
-        normal,
-        certificate([String])
+        normal
 }
 
 public enum CertificatePinningError: Error {
@@ -19,6 +19,9 @@ extension CertificatePinning {
         switch self {
         case .adhoc(let verifier):
             verifier(metadata, trust, complete)
+        case .certificate(let pinned):
+            let certs = getEncCert(from: trust).filter { pinned.contains($0) }
+            complete(!certs.isEmpty)
         case .insecure:
             debugPrint("it is prefered that you use a pinned certificate.")
             debugPrint("for this server you could pin:")
@@ -28,15 +31,6 @@ extension CertificatePinning {
             let trust = sec_trust_copy_ref(trust).takeRetainedValue()
             var error: CFError?
             complete(SecTrustEvaluateWithError(trust, &error))
-        case .certificate(let pinned):
-            let base64certs = getEncCert(from: trust)
-            for cert in base64certs {
-                if pinned.contains(cert) {
-                    complete(true)
-                    break
-                }
-            }
-            complete(false)
         }
     }
 }
