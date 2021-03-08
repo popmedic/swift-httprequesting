@@ -20,12 +20,12 @@ extension CertificatePinning {
         case .adhoc(let verifier):
             verifier(metadata, trust, complete)
         case .certificate(let pinned):
-            let certs = getEncCert(from: trust).filter { pinned.contains($0) }
+            let certs = getEncCerts(from: trust).filter { pinned.contains($0) }
             complete(!certs.isEmpty)
         case .insecure:
             debugPrint("it is prefered that you use a pinned certificate.")
             debugPrint("for this server you could pin:")
-            getEncCert(from: trust).forEach { debugPrint($0) }
+            getEncCerts(from: trust).forEach { debugPrint($0) }
             complete(true)
         case .normal:
             let trust = sec_trust_copy_ref(trust).takeRetainedValue()
@@ -43,7 +43,7 @@ private func sha256(data : Data) -> Data {
     return Data(hash)
 }
 
-private func getEncCert(from trust: sec_trust_t) -> [String] {
+private func getEncCerts(from trust: sec_trust_t) -> [String] {
     let trust = sec_trust_copy_ref(trust).takeRetainedValue()
     let count = SecTrustGetCertificateCount(trust)
     var result = [String]()
